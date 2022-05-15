@@ -19,8 +19,8 @@ class AnnotatorFrontend:
         else:
             self.img.set_data(img)
 
-    def display_legend(self, codes: OrderedDict[str, Tuple[int, str]]) -> None:
-        for key, (_, _class) in codes.items():
+    def display_legend(self, keys: List[str], classes: List[str]) -> None:
+        for key, _class in zip(keys, classes):
             self.ax.scatter(0, 0, alpha=0, label=f"{_class}: {key}")
         self.ax.legend()
         self.bbox = None

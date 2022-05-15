@@ -13,13 +13,14 @@ class AnnotatorBackend:
     def __init__(self,
                  img_dir: str,
                  ann_dir: str,
-                 classes: List[str]) -> None:
+                 classes: List[str],
+                 keys: List[str],
+                 labels: List[int]) -> None:
         self.img_dir = img_dir.rstrip('/') + '/'
         self.ann_dir = ann_dir.rstrip('/') + '/'
-        self.classes = classes + ['Unknown']
-        self.codes = OrderedDict()
-        for i, _class in enumerate(self.classes):
-            self.codes['azertyqsdfg'[i]] = (i, _class)
+        self.classes = classes 
+        self.keys = keys
+        self.labels = labels
         self.frontend = AnnotatorFrontend()
         self.current_index = -1
         self.current_img_filename = ''
@@ -28,9 +29,10 @@ class AnnotatorBackend:
 
     def ann_loop(self) -> int:
         annotation = ''
-        while annotation not in self.codes:
+        key2lbl = {key : lbl for key, lbl in zip(self.keys, self.labels)}
+        while annotation not in key2lbl:
             annotation = input()
-        return self.codes[annotation][0]
+        return key2lbl[annotation]
 
     def save(self) -> None:
         current_ann_filename = self.current_img_file[:-3] + 'txt'
@@ -55,7 +57,7 @@ class AnnotatorBackend:
                 return None
             if self.unlabeled_bboxes:
                 self.frontend.display_image(self.get_image())
-                self.frontend.display_legend(self.codes)
+                self.frontend.display_legend(self.classes, self.keys)
             else:
                 self.labeled_bboxes = []
         self.main_loop()
